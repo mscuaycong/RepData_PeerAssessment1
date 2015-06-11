@@ -1,19 +1,16 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author:  "Melissa Cuaycong"
-output:  
-  html_document:   
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Melissa Cuaycong  
 
 
 ## Loading and preprocessing the data
-```{r ReadData}
+
+```r
 activity<-read.csv("./activity/activity.csv", na.strings="NA")
 ```
 
 ## What is mean total number of steps taken per day?
-```{r ProcessData_TotalSteps}
+
+```r
 library(plyr)
 
 #Calculate the total steps per day
@@ -23,17 +20,22 @@ stepsPD <-ddply(activity,.(date),summarize,
 hist(stepsPD$stepspd,main="Total Steps Per Day",
      xlab="Total Steps",
      ylab="Frequency")
+```
 
+![](PA1_template_files/figure-html/ProcessData_TotalSteps-1.png) 
+
+```r
 #Calculate the mean of the total number of steps taken per day.
 meanSteps <-format(mean(stepsPD$stepspd,na.rm=TRUE),big.mark=",",scientific=FALSE)
 medianSteps <-format(median(stepsPD$stepspd,na.rm=TRUE),big.mark=",",scientific=FALSE)
 ```
 
->The MEAN of the total number of steps taken per day is _**`r meanSteps`**_.
-The MEDIAN of the total number of steps taken per day is _**`r medianSteps`**_.
+>The MEAN of the total number of steps taken per day is _**10,766.19**_.
+The MEDIAN of the total number of steps taken per day is _**10,765**_.
 
 ## What is the average daily activity pattern?
-```{r ProcessData_AverageDaily}
+
+```r
 #Calculate the average number of steps per interval across all days.
 stepsInt <-ddply(activity, .(interval), summarize,
                  meansteps = mean(steps,na.rm=TRUE))
@@ -41,23 +43,27 @@ stepsInt <-ddply(activity, .(interval), summarize,
 plot(stepsInt$interval,stepsInt$meansteps,type="l",
      xlab="5-minute Interval",
      ylab="Average Steps")
-               
+```
+
+![](PA1_template_files/figure-html/ProcessData_AverageDaily-1.png) 
+
+```r
 #Get the max of the average steps per interval.
 maxSteps<-format(max(stepsInt$meansteps),big.mark=",",digits=1) 
 
 #Determine which 5-minute interval this maximum occurs.
 maxInt<-stepsInt[which.max(stepsInt$meansteps),"interval"]
 maxInt<-paste0(trunc(maxInt/100),":",((maxInt/100)-trunc(maxInt/100))*100)
-
 ```
 
->On average, across all the days, the maximum steps of _**`r maxSteps`**_ occurs in
-the 5-minute interval, at  _**`r maxInt`**_.
+>On average, across all the days, the maximum steps of _**206**_ occurs in
+the 5-minute interval, at  _**8:35**_.
 
 ## Imputing missing values
 
 
-```{r FindMissing}
+
+```r
 #Calculate and report the total number of missing values in the dataset (i.e. the total
 #number of rows with NAs) 
 
@@ -65,13 +71,14 @@ completerows<-complete.cases(activity)
 numNArows <-format(table(completerows)["TRUE"],big.mark=",")
 ```
 
->There are _**`r numNArows`**_ rows with missing values.
+>There are _**15,264**_ rows with missing values.
 
 Create an adjusted activity dataset with the NA values for number of steps imputed.
 Methodology:  Use the average steps for the specific interval (calculated from available data across all days),
    to replace the NA values for the specific interval.
    
-```{r ImputeMissing}
+
+```r
 #Identify and split missing rows from dataset
 narows<-activity[!complete.cases(activity),c("date","interval","steps")]
 fullrows<-activity[complete.cases(activity),c("date","interval","steps")]
@@ -84,13 +91,13 @@ names(newnarows)[names(newnarows)=="meansteps"] <- "steps"
 
 #Create duplicate dataset with missing values imputed
 activityAdj<-rbind(fullrows,newnarows)
-
 ```
 
 Next, evaluate the adjusted dataset with the imputed NA values.
 Compare findings with the unadjusted dataset.
 
-```{r EvaluateNAAdjDataset}
+
+```r
 #Calculate total steps by day for adjusted dataset.
 stepsPDA <-ddply(activityAdj,.(date),summarize,
                 stepspd = sum(steps))
@@ -99,14 +106,18 @@ stepsPDA <-ddply(activityAdj,.(date),summarize,
 hist(stepsPDA$stepspd, main="Total Steps Per Day (NAs Imputed)",
      xlab="Total Steps",
      ylab="Frequency")
+```
 
+![](PA1_template_files/figure-html/EvaluateNAAdjDataset-1.png) 
+
+```r
 #Calcualte the mean and median steps for total steps per day.
 meanStepsA <-format(mean(stepsPDA$stepspd,na.rm=TRUE), big.mark=",",scientific=FALSE)
 medianStepsA <-format(median(stepsPDA$stepspd,na.rm=TRUE),big.mark=",",scientific=FALSE)
 ```
 
->The MEAN of the total number of steps taken per day is _**`r meanStepsA`**_.
-The MEDIAN of the total number of steps taken per day is _**`r medianStepsA`**_.
+>The MEAN of the total number of steps taken per day is _**10,766.19**_.
+The MEDIAN of the total number of steps taken per day is _**10,766.19**_.
 The MEAN and MEDIAN are the same for the adjusted dataset.
 
 ###Compare mean/median data between the 2 datasets.
@@ -114,8 +125,8 @@ The MEAN and MEDIAN are the same for the adjusted dataset.
 >
 Measure       | Activity (NAs)| Activity (NAs imputed)
 ------------- | ------------- | ----------------------
-MEAN          | `r meanSteps` | `r meanStepsA` 
-MEDIAN        | `r medianSteps`|`r medianStepsA`
+MEAN          | 10,766.19 | 10,766.19 
+MEDIAN        | 10,765|10,766.19
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -123,8 +134,8 @@ MEDIAN        | `r medianSteps`|`r medianStepsA`
 Create a factor variable in the adjusted dataset to indicate whether the measurement was taken
 on a weekday or a weekend.  Evaluate results.
 
-```{r EvaluateWeekdays}
 
+```r
 #Create a flag (factor variable) in the adjusted dataset to indicate weekday or
 #weekend #based on the date #measurement was taken
 tempday <- weekdays(as.Date(activityAdj$date),abbreviate=TRUE)
@@ -146,6 +157,8 @@ p <- p +
         ggtitle("Average Steps Per 5-Min Interval ")
 print(p)
 ```
+
+![](PA1_template_files/figure-html/EvaluateWeekdays-1.png) 
 
 > Weekend activity is, on average slower than Weekday activity. 
 Most activity on weekday occurs during the first part of the day, prior to 10 am.  
