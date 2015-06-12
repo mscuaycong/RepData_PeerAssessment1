@@ -67,9 +67,9 @@ numNArows <-format(table(completerows)["TRUE"],big.mark=",")
 
 >There are _**`r numNArows`**_ rows with missing values.
 
-Create an adjusted activity dataset with the NA values for number of steps imputed.
-Methodology:  Use the average steps for the specific interval (calculated from available data across all days),
-   to replace the NA values for the specific interval.
+>Create an adjusted activity dataset with the NA values for number of steps imputed.
+
+>**Methodology:**  Use the average steps for the specific interval (calculated from available data across all days), to replace the NA values for the specific interval.
    
 ```{r ImputeMissing}
 #Identify and split missing rows from dataset
@@ -147,7 +147,10 @@ p <- p +
 print(p)
 ```
 
-> Weekend activity is, on average slower than Weekday activity. 
-Most activity on weekday occurs during the first part of the day, prior to 10 am.  
-However, on weekends, also more activity priot to 10 am, but activity is much
-more evenly spaced throughout the day.
+> While the maximum of the average steps per interval is higher on a weekday,
+Weekend activity is, on average more active throughout the day than Weekday activity. 
+There seems to be a flurry of activity prior to 10 AM on weekdays, starting the day
+earlier (around 5 AM) than on weekends. However, the activity slows down after 10 AM.
+
+>On the other hand, peak activity for weekends also happens prior to 10 AM.  But,
+activity continues to throughout the day at a higher pace than on weekdays.
